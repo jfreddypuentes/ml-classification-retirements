@@ -1,0 +1,660 @@
+---
+title: "Parcial 1 - Machine Learning"
+author: "Norma Yuliana Cala, Lady Alexandra Duarte, Jhon Freddy Puentes"
+date: "12/12/2020"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+# Etapa 1: Definición del problema
+### ¿Qué se pretende predecir?
+Se desea predecir la probabilidad de que un empleado se retire o no de la empresa.
+
+### ¿De qué datos se dispone?
+Disponemos de datos históricos de retiros de empleados en una empresa.
+
+
+### ¿Cuál es la métrica de éxito?
+Consideraremos como métrica de exito la creación del un modelo que sea capaz de p#predecir minimo el 90% de los casos de retiro.
+
+# Etapa 2: Datos
+el set de datos <span style="color:#CD5C5C"><strong>`UNION_EMPLEADOS_RETIROS.csv`</strong></span> contiene información sobre los empleados, datos de contratos y observaciones de retiros de empleados en una compañia. Además de esto, incluye las siguientes varibles adicionales:
+
+
+* <span style="color:#CD5C5C">`FECHA`</span>: 
+* <span style="color:#CD5C5C">`CODIGO_EMPRESA`</span>: código unico de la compañia.
+* <span style="color:#CD5C5C">`ID_GENERO`</span>: Identificador del genero de la persona.
+* <span style="color:#CD5C5C">`ID_ESTADO_CIVIL`</span>: Identificador del estado civil.
+* <span style="color:#CD5C5C">`FECHA_NACIMIENTO`</span>: Fecha de nacimiento el empleado.
+* <span style="color:#CD5C5C">`CODIGO_LOCALIDAD`</span>: Identificador la localidad del empleado.
+* <span style="color:#CD5C5C">`TIPO_NOMINA`</span>: Tipo de vinculación de la persona con la empresa.
+* <span style="color:#CD5C5C">`FECHA_INGRESO`</span>: Fecha de inicio de labores en la compañia.
+* <span style="color:#CD5C5C">`FECHA_INICIO_CONTRATO`</span>: Fecha de inicio de labores en la compañia.
+* <span style="color:#CD5C5C">`ID_CARGO`</span>: Identificador del cargo del empleado.
+* <span style="color:#CD5C5C">`TIPO_CARGO`</span>: Descripción del tipo de cargo.
+* <span style="color:#CD5C5C">`NIVEL_CARGO`</span>: Identificador del nivel de cargo.
+* <span style="color:#CD5C5C">`CATEGORIA_CARGO`</span>: Identificador de la categoría del cargo.
+* <span style="color:#CD5C5C">`TIPO_AREA`</span>: Área de la compañia a la que pertenece o perteneció el empleado.
+* <span style="color:#CD5C5C">`ID_CENTRO_COSTO`</span>: Identificador del centro del costo.
+* <span style="color:#CD5C5C">`SENAL_SINDICALIZADO`</span>: Carácter que indica si es o era de un sindicato.
+* <span style="color:#CD5C5C">`CLASE_EMPLEADO`</span>: Descripción que indica la clase de empleado.
+* <span style="color:#CD5C5C">`CLASE_NOMINA`</span>: Identificador del tipo de vinculación de la persona con la empresa.
+* <span style="color:#CD5C5C">`SUBSIDIO_TRANSPORTE`</span>: Identificador que indica si tiene o tuvo subsidio de transporte.
+* <span style="color:#CD5C5C">`PORCENTAJE_RIESGO`</span>: Porcentaje de riesgo del cargo.
+* <span style="color:#CD5C5C">`SALARIO`</span>: Salario base del empleado.
+* <span style="color:#CD5C5C">`COMPENSACION_VARIABLE`</span>: Valor de compensación variable en caso de que reciba.
+* <span style="color:#CD5C5C">`PORCENT_COMP_VARIABLE`</span>: Valor en % de compensación variable en caso de que reciba.
+* <span style="color:#CD5C5C">`TOTAL_SALARIO`</span>: Total recibido por el empleado. salario + compensación variable.
+* <span style="color:#CD5C5C">`CEDULA_ANONIMIZADA`</span>: Identificador único del empleado en la base de datos.
+* <span style="color:#CD5C5C">`UBICACION_ANONIMIZADA`</span>: Identificador de la ubicación del empleado.
+* <span style="color:#CD5C5C">`CAUSA_NOMBRE`</span>: Descripción de la causa de retiro.
+* <span style="color:#CD5C5C">`TIPO_DE_RETIRO`</span>: Descripción del tipo de retiro del empleado.
+* <span style="color:#CD5C5C">`FECHA_FIN_CONTRATO`</span>: Fecha fin del contrato del empleado.
+<br><br><br>
+
+## Etapa Depuración Datos
+*Para el conjunto de datos de Empleados y Retiros se realizó la siguiente depuración de registros con el consentimiento de que las descripciones siguientes no aportarían al modelo de predicción porque interfieren en las predicciones por ser datos que llevarían a una ppredicción direfente.
+* Total datos = 40.813únicos de toda la base = 1.872* Datos a Eliminar
+Edad menores de 18 años = 14
+Nota: Registros con 2 y 11 años.* Causa nombre
+Eliminar Fallecidos = 151
+Eliminar Pensionados = 411* Tipo Nomina
+Eliminar Aprendiz Sena = 2.072
+Jubilados por la empresa = 297Por último se quitan todos los duplicados 36.289 y se dejamos el registro con el mayor salario para quedarnos con 1.579 registros únicos por cliente.
+
+En la <span style="color:#CD5C5C"><strong>`descripción del procesamiento y arreglo de la información`</strong></span> se describen los procesos relizados a cada uno de los campos donde fue necesario realzar actividades como: homologaciones, cruces de datos entre vacios y los que contenían información para traer los datos correspondientes a cada uno de los registros necesarios para completar la información en las variables, asignación de registros DUMMY entre otros, a continuación se desglozan las actividades realizadas:
+Tipo texto = NO DEFINIDO
+Tipo número = 999999
+
+* <span style="color:#CD5C5C">`Fecha`</span> Se personaliza el formato de las fechas.
+<br><div style="text-align:center;">
+<TABLE BORDER>
+	<TR>
+		<TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>FECHAS</TD> <TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>FORMATO</TD>
+	</TR>
+	<TR>
+		<TD>2017-12-19 00:00:00 UTC</TD> <TD>dd/MM/yyyy</TD> 
+	</TR>
+</TABLE><br></div> 
+
+* <span style="color:#CD5C5C">`Género`</span> Se encuentran 1.218 registros sin género, se procede a realizar el cruce de datos para encontrar el valor correspondiente para el registro.
+
+* <span style="color:#CD5C5C">`Estado civil`</span>: Las observaciones para el estado civil vienen de diferentes maneras por lo que se unifica la descripción y se homologan algunos registros.
+Para valores 0, vacios, ND, no definido se procede a realizar el cruce de datos para encontrar el valor correspondiente para el registro. Los que aún no se encontraron con valor se homologan con NO DEFINIDO.
+Algunas cédulas tenían asignados los valores de M y F por tal motivo se asignó el valor  con mayor número según el conteo.
+<br><div style="text-align:center;">
+<TABLE BORDER>
+	<TR>
+		<TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>VALOR</TD> <TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>ASIGNACIÓN</TD>
+	</TR>
+	<TR>
+		<TD>cas</TD> <TD>CASADO</TD> 
+	</TR>
+		<TR>
+		<TD>div</TD> <TD>DIVORCIADO</TD> 
+	</TR>
+		<TR>
+		<TD>sep</TD> <TD>SEPARADO</TD> 
+	</TR>
+		<TR>
+		<TD>sol</TD> <TD>SOLTERO</TD> 
+	</TR>
+		<TR>
+		<TD>uni</TD> <TD>UNION LIBRE</TD> 
+	</TR>
+		<TR>
+		<TD>viu</TD> <TD>VIUDO</TD> 
+	</TR>
+	<TR>
+		<TD>vacios</TD> <TD>NO DEFINIDO</TD> 
+	</TR>
+</TABLE><br></div> 
+
+
+* <span style="color:#CD5C5C">`Código localidad`</span> 
+Para los 2.293 registros con valores 0 y vacíos se realiza la búsqueda de información cruzando los campos vacíos con los que sí tienen información para para traer el valor. Si no hay se dejan como 999999.
+
+* <span style="color:#CD5C5C">`Fecha Nacimiento`</span> Se saca una nueva variable llamada Edad, restando el año actual con la fecha de nacimiento. 
+
+* <span style="color:#CD5C5C">`Tipo de Nómina`</span> Esta columan de informacióon viene mezclados tanto códigos como descripción del tipo de nomina que tiene. Se hace necesario realizar cruces y trer información para completar la información que está como codficada con números. Lo que no se encuentre en la base se le asigna el valor DUMMY.
+<br><div style="text-align:center;">
+<TABLE BORDER>
+	<TR>
+		<TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>VALOR</TD> <TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>ASIGNACIÓN</TD>
+	</TR>
+	<TR>
+		<TD>EST UNIVERSITARIO EN PRACTICA</TD> <TD>APRENDIZ SENA</TD> 
+	</TR>
+		<TD>s,f, I, 1,2,3,4,6,9,15</TD> <TD>NO DEFINIDO</TD> 
+	</TR>
+		<TR>
+		<TD>vacías</TD> <TD>NO DEFINIDO</TD> 
+	</TR>
+</TABLE><br></div> 
+
+
+* <span style="color:#CD5C5C">`Tipo Cargo`</span> Valores O, N/A, Vacías  se realiza la búsqueda de información cruzando los campos vacíos con los que sí tienen información para para traer el valor
+<br><div style="text-align:center;">
+<TABLE BORDER>
+	<TR>
+		<TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>VALOR</TD> <TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>ASIGNACIÓN</TD>
+	</TR>
+	<TR>
+		<TD>OPERATIVA</TD> <TD>OPERATIVO</TD> 
+	</TR>
+		<TR>
+		<TD>DIRECCIÓN</TD> <TD>DIRECCION</TD> 
+	</TR>
+		<TR>
+		<TD>DIRECTOR</TD> <TD>DIRECTIVO</TD> 
+	</TR>
+</TABLE><br></div> 
+
+
+
+* <span style="color:#CD5C5C">`ID Cargo`</span> Se homologan así: 
+<br><div style="text-align:center;">
+<TABLE BORDER>
+	<TR>
+		<TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>VALOR</TD> <TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>ASIGNACIÓN</TD> 
+	</TR>
+	<TR>
+		<TD>0</TD> <TD>999999</TD> 
+	</TR>
+		<TR>
+		<TD>vacíos</TD> <TD>999999</TD> 
+	</TR>
+</TABLE><br></div> 
+
+              
+* <span style="color:#CD5C5C">`Causa Nombre`</span> Algunos nombres se referencian a lo mismo por tal motivo se hacen homologaciones.
+<br><div style="text-align:center;">
+<TABLE BORDER>
+	<TR>
+		<TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>VALOR</TD> <TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>ASIGNACIÓN</TD> 
+	</TR>
+	<TR>
+		<TD>PENSIÒN DE VEJEZ</TD> <TD>PENSION DE VEJEZ</TD> 
+	</TR>
+		<TR>
+		<TD>PENSION DE VEJEZ</TD> <TD>PENSION</TD> 
+	</TR>
+	<TR>
+		<TD>RENUNCIA</TD> <TD>VOLUNTARIA</TD> 
+	</TR>
+		<TR>
+		<TD>TERMINACIÓN UNILATERAL</TD> <TD>TERMINACION UNILATERAL</TD> 
+	</TR>
+</TABLE><br></div> 
+
+
+* <span style="color:#CD5C5C">`Fecha inicio de contraro`</span> Algunas columnas se encuentran con registros vacios y en la columna de inicio de contrato si registra datos, dicho de esta manera se traen los datos de esta columna para rellenar la columna faltante.
+
+* <span style="color:#CD5C5C">`Tipo de retiro`</span> Algunos campos se les realiza la homologación.
+<br><div style="text-align:center;">
+<TABLE BORDER>
+	<TR>
+		<TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>VALOR</TD> <TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>ASIGNACIÓN</TD> 
+	</TR>
+	<TR>
+		<TD>DESEADA</TD> <TD>DESEADO</TD> 
+	</TR>
+		<TR>
+		<TD>No Deseada </TD> <TD>NO DESEADO</TD> 
+	</TR>
+</TABLE><br></div> 
+
+* <span style="color:#CD5C5C">`Id Cargo`</span> Valor 0 se asigna el DUMMY de valor 999999
+
+* <span style="color:#CD5C5C">`Nivel Cargo`</span> 
+<br><div style="text-align:center;">
+<TABLE BORDER>
+	<TR>
+		<TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>VALOR</TD> <TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>ASIGNACIÓN</TD> 
+	</TR>
+	<TR>
+		<TD>0</TD> <TD>Vacíos</TD> 
+	</TR>
+		<TR>
+		<TD>-1</TD> <TD>Vacíos</TD> 
+	</TR>
+	<TR>
+		<TD>Vacios</TD> <TD>999999</TD> 
+	</TR>
+</TABLE><br></div> 
+
+  
+* <span style="color:#CD5C5C">`Categoría Cargo`</span> 
+<br><div style="text-align:center;">
+<TABLE BORDER>
+	<TR>
+		<TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>VALOR</TD> <TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>ASIGNACIÓN</TD> 
+	</TR>
+	<TR>
+		<TD>0</TD> <TD>Vacíos</TD> 
+	</TR>
+		<TR>
+		<TD>-1</TD> <TD>Vacíos</TD> 
+	</TR>
+	<TR>
+		<TD>Vacios</TD> <TD>999999</TD> 
+	</TR>
+</TABLE><br>
+</div> 
+
+
+* <span style="color:#CD5C5C">`Tipo Area`</span> Columna de información en donde se realizaron más homologaciones para las observaciones de los registros incluidos.
+<br><div style="text-align:center;">
+<TABLE BORDER>
+	<TR>
+		<TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>VALOR</TD> <TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>ASIGNACIÓN</TD> 
+	</TR>
+	  <TR>
+		<TD>-</TD> <TD>Vacíos</TD> 
+	</TR>
+		<TR>
+		<TD>0</TD> <TD>Vacíos</TD> 
+	</TR>
+  	<TR>
+		<TD>N/A</TD> <TD>Vacíos</TD> 
+	</TR>
+		<TR>
+		<TD>ADMINISTRAVIVO</TD> <TD>ADMINISTRATIVO</TD> 
+	</TR>
+		<TR>
+		<TD>OPERATIVA</TD> <TD>OPERATIVO</TD> 
+	</TR>
+		<TR>
+		<TD>PRODUCCIÓN</TD> <TD>PRODUCCION</TD> 
+	</TR>
+		<TR>
+		<TD>ADMINISTRACION PLANTA</TD> <TD>PLANTA ADMINISTRATIVO</TD> 
+	</TR>
+		<TR>
+		<TD>MARCAS</TD> <TD>MARCAS DE CANAL</TD> 
+	</TR>
+		<TR>
+		<TD>N/A</TD> <TD>Vacíos</TD> 
+	</TR>
+		<TR>
+		<TD>N/A</TD> <TD>Vacíos</TD> 
+	</TR>
+		<TR>
+		<TD>ADMINISTRATIVA PLANTA</TD> <TD>ADMINISTRATIVO PLANTA</TD> 
+	</TR>
+  	<TR>
+  	<TD>ADMINISTRACION PLANTA</TD> <TD>ADMINISTRATIVO PLANTA</TD> 
+	</TR>
+  	<TR>
+  	<TD>Vacíos</TD> <TD>NO DEFINIDO</TD> 
+	</TR>
+</TABLE><br></div> 
+ 
+
+* <span style="color:#CD5C5C">`Clase Empleado`</span>   
+<br><div style="text-align:center;">
+<TABLE BORDER>
+	<TR>
+		<TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>VALOR</TD> <TD align="center" bgcolor="666666"><font color="#FFFFFF"><strong>ASIGNACIÓN</TD> 
+	</TR>
+	<TR>
+		<TD>0,3,4,5</TD> <TD>Vacíos</TD> 
+	</TR>
+	<TR>
+		<TD>Vacios</TD> <TD>999999</TD> 
+	</TR>		
+</TABLE><br></div> 
+
+
+* <span style="color:#CD5C5C">`Porcentaje Riesgo`</span> Para los valores que no tienen datos se les asigna el valor DUMMY correspondiente al tipo de dato en este caso 999999.
+
+
+* <span style="color:#CD5C5C">`Total Salario`</span> Se calcula el total salario con el calculo se define sumando las columnas de Salario más Compensación variable.
+
+* <span style="color:#CD5C5C">`Retiro`</span> Para los valores que se encontraron como vaciós se realiza la validación de que no tienen fecha de retiro ni causa de retiro y se les asigna el valor 0.
+
+<br>
+<br>
+<br>
+
+### Lectura de datos
+```{r}
+datos <- read.csv(file = 'UNION_EMPLEADOS_RETIROS.csv', sep = ';')
+```
+
+
+### Análisis exploratorio
+```{r}
+library(skimr)
+```
+
+#### En el siguiente resultado podrá observar las principales metricas de los datos, de una forma estructurada y compacta.
+```{r}
+#skim(datos) # Comentar para generar PDF
+```
+
+#### Veamos algunos ejemplos de los datos
+```{r}
+head(datos, 8)
+```
+
+### Número de observaciones y valores ausentes
+```{r}
+# datos %>% map_dbl(.f = function(x){ sum(is.na(x)) })
+```
+La base de datos no tiene valores ausentes en ninguna observación.
+
+
+# Etapa 3: Pre-procesamiento
+Decidimos estudiar y aprender a usar la libreria mlr3, nos gustó muchisimo lo potente y sencilla que es. Asi que la aplicamos al proyecto una vez estudiada.
+
+```{r}
+# Imporamos la libreria base.
+library(mlr3)
+```
+
+Para definir la tarea del clsificador, lo primero que haremos es convertir la variable objetivo de tipo numeric a factor. Ya que asi lo requiere la instancia de task.
+```{r}
+datos$GRUPO <- ifelse(datos$RETIRO==1, 'RETIRADO', 'ACTIVO')
+```
+
+Validemos que en efecto sea de tipo factor.
+```{r}
+datos$GRUPO <- as.factor(datos$GRUPO)
+class(datos$GRUPO)
+```
+
+```{r}
+# Convertir las columnas de datos categoricos como factores.
+datos$ID_GENERO <- as.factor(datos$ID_GENERO)
+datos$ID_ESTADO_CIVIL <- as.factor(datos$ID_ESTADO_CIVIL)
+datos$TIPO_NOMINA <- as.factor(datos$TIPO_NOMINA)
+datos$TIPO_CARGO <- as.factor(datos$TIPO_CARGO)
+datos$TIPO_AREA <- as.factor(datos$TIPO_AREA)
+datos$SENAL_SINDICALIZADO <- as.factor(datos$SENAL_SINDICALIZADO)
+datos$CLASE_EMPLEADO <- as.factor(datos$CLASE_EMPLEADO)
+datos$SUBSIDIO_TRANSPORTE <- as.factor(datos$SUBSIDIO_TRANSPORTE)
+datos$CAUSA.NOMBRE <- as.factor(datos$CAUSA.NOMBRE)
+datos$TIPO.DE.RETIRO <- as.factor(datos$TIPO.DE.RETIRO)
+
+datos$FECHA  <- as.factor(datos$FECHA)
+datos$FECHA.FIN.CONTRATO <- as.factor(datos$FECHA.FIN.CONTRATO)
+datos$FECHA_INGRESO <- as.factor(datos$FECHA_INGRESO)
+datos$FECHA_INICIO_CONTRATO <- as.factor(datos$FECHA_INICIO_CONTRATO)
+datos$FECHA_NACIMIENTO <- as.factor(datos$FECHA_NACIMIENTO)
+```
+
+```{r}
+# Convertir las columnnas con datos numericos a tipos numericos.
+datos$COMPENSACION_VARIABLE <- as.numeric(datos$COMPENSACION_VARIABLE)
+datos$PORCENTAJE_RIESGO  <- as.numeric(datos$PORCENTAJE_RIESGO)
+datos$TOTAL_SALARIO <- as.numeric(datos$TOTAL_SALARIO)
+```
+
+## Elección de variables
+Justificación desde el punto de vista de la elección de las variables predictoras. De forma manual creemos que las variables mas importantes seran:
+<br>
+* edad
+* causa de retiro
+* fecha retiro
+* tipo de cargo
+* salario
+<br>
+Ya que pueden influir en la desición de que una persona se vaya o no. Y las primeras variables porque estan directamente relacionadas con la variable objetivo. Es decir, si tiene causa de retiro es porque se retiró, de ahi viene la etiqueta.
+<br>
+Sin embargo, usaremos la potencia de la libreria MLR3 para que indicarle al objeto learner y el task que hagan el feature selection automaticamente.
+<br>
+<br>
+<br>
+
+# Etapa 4: Modelado, pruebas, evaluación y optimizacion
+```{r}
+# Definimos una tarea para clasificar, configuramos los datos, la variable objetivo y la clase positiva. 
+task_clasificar <- TaskClassif$new(id = "datos", backend = datos, target = "GRUPO", positive = 'RETIRADO')
+task_clasificar
+```
+Al imprimir el objeto <span style="color:#CD5C5C">`task_clasificar`</span> podemos observar que nuestros target es la variable <span style="color:#CD5C5C">`GrUPO`</span>, apreciamos que nuestro modelo posee 2 clases para clasificar: <span style="color:#CD5C5C">`RETIRADO`</span>  o <span style="color:#CD5C5C">`ACTIVO`</span>; Finalmente, observamos que tenemos 31 features.
+
+
+
+
+```{r}
+# Definimos un objeto learner y lo inicializamos con el metodo de aprendizaje de clasificacion
+learner_clasificar <- lrn("classif.rpart", cp = .01)
+learner_clasificar
+```
+
+
+```{r}
+# Veamos las variables mas importantes para el modelo
+library("mlr3filters")
+filter = flt("importance", learner = learner_clasificar)
+filter$calculate(task_clasificar)
+head(as.data.table(filter), 3)
+```
+
+
+```{r}
+# Division de datos para entrenamiento y pruebas desde el objeto (task_clasificar)
+train_set <- sample(task_clasificar$nrow, 0.8 * task_clasificar$nrow)
+test_set <- setdiff(seq_len(task_clasificar$nrow), train_set)
+```
+
+
+```{r}
+# Entrenamos el modelo con los datos de (train_set)
+learner_clasificar$train(task_clasificar, row_ids = train_set)
+```
+
+```{r}
+# Realizamos la prediccion con el objeto learner_clasificar con los datos de (test_set)
+prediction <- learner_clasificar$predict(task_clasificar, row_ids = test_set)
+```
+
+```{r}
+# Veamos los resultados del modelo y como le fué con la prediccion en el set de pruebas.
+print(prediction)
+head(as.data.table(prediction))
+```
+
+```{r}
+# Veamos la matriz de confusion
+prediction$confusion
+```
+
+```{r}
+# Veamos algunos datos de la predicción
+head(prediction$data)
+```
+
+```{r}
+# Veamos la metrica de exactitud de la prediccion
+measure <- msr("classif.acc")
+prediction$score(measure)
+```
+
+
+# Re-construyamos la instancia del modelo usando Validacion Cruzada
+```{r}
+resampling_cross_validation <- rsmp("cv", folds = 3L)
+resampling <- resample(task_clasificar, learner_clasificar, resampling_cross_validation)
+resampling$score(measure)
+```
+
+```{r}
+# Veamos la metrica de accuracy
+resampling$aggregate(measure)
+```
+
+```{r}
+# Veamos la matriz de confusion.
+resampling$prediction()$confusion
+```
+
+
+```{r}
+# Cambiemos el tipo de prediccion del modelo para ver las probabilidades.
+learner_clasificar$predict_type = "prob"
+```
+
+
+```{r}
+# re-entrenamos el modelo 
+learner_clasificar$train(task_clasificar, row_ids = train_set)
+```
+
+
+```{r}
+# Veamos que tiene el objeto modelo por dentro
+learner_clasificar$model
+```
+
+```{r}
+# Hacemos de nuevo una prediccion con los datos de pruebas.
+prediction = learner_clasificar$predict(task_clasificar, row_ids = test_set)
+```
+
+
+
+```{r}
+# Veamos respuestas y probabilidades juntas.
+head(as.data.table(prediction))
+```
+
+
+
+```{r}
+head(prediction$response)
+```
+
+```{r}
+head(prediction$prob)
+```
+
+
+```{r}
+library("mlr3viz")
+
+autoplot(prediction)
+```
+
+# Curva ROC
+```{r}
+ggplot2::autoplot(prediction, type = "roc")
+```
+# Precision vs Recall
+```{r}
+ggplot2::autoplot(prediction, type = "prc")
+```
+
+
+```{r}
+measure = msr("classif.acc")
+prediction$score(measure)
+```
+
+```{r}
+measure_1 = msr("classif.bacc")
+prediction$score(measure_1)
+```
+```{r}
+measure_2 = msr("classif.ce")
+prediction$score(measure_2)
+```
+
+
+# Veamos ahora como manejamos el imbalance de clases con los metodos de undersample, oversample y smote
+
+```{r}
+# Veamos el tamaño de cada clase
+table(task_clasificar$truth())
+```
+Se nota que estan bastante desbalanceadas las clases. Vamos a revisarlo.
+
+<br>
+<br>
+<br>
+
+Vamos a balancear por los tres metodos para ver como nos va.
+
+### Vamos a disminuir la clase mayoritaria en 1/3
+```{r}
+# under = po("classbalancing", id = "undersample", adjust = "major", reference = "major", shuffle = FALSE, ratio = 1 / 3) # Comentar para generar PDF
+# table(under$train(list(task_clasificar))$output$truth()) # Comentar para generar PDF
+```
+
+### Vamos a aumentar la clase minitoria a 3 veces.
+```{r}
+# over = po("classbalancing", id = "oversample", adjust = "minor", reference = "minor", shuffle = FALSE, ratio = 3) # Comentar para generar PDF
+# table(over$train(list(task_clasificar))$output$truth()) # Comentar para generar PDF
+```
+
+
+
+Dado que no todas las variables son numericas, no podremos usar SMOTE por esta ocasion. Aunque podriamos pasar todo a numeros, pero no es un costo que asumiremos esta vez.
+
+
+# Veamos las propiedades del modelo:
+```{r}
+learner_clasificar$model
+```
+# Etapa 5: Extracción de resultados para su uso en producción 
+```{r}
+prediccion_todos_los_datos <- predict(learner_clasificar, datos, predict_type = "<Prediction>")
+
+
+# Agregamos a los datos los valores de la prediccion
+datos$prediccion <- prediccion_todos_los_datos$data$response
+
+```
+
+```{r}
+# Seleccionamos solo las columnas de interes
+library(dplyr)
+
+resultado_final <- datos %>% select(CEDULA_ANONIMIZADA, GRUPO, prediccion )
+head(resultado_final)
+```
+
+```{r}
+# install.packages("writexl")
+library("writexl")
+write_xlsx(resultado_final,"resultado_prediccion.xlsx")
+```
+
+
+# Etapa 6: Conclusiones y recomendaciones
+* Los datos estaban muy sucios. Lo que nos puso un gran reto para entenderlos, limpiarlos, unirlos y prepararlos para empezar a usarlos.
+* La cantidad de empleados retirados y activos son bastantes diferentes. Lo que causa que las clases esten desbalamceadas.
+* Entender y usar librerias potentes nos permiten ahorrar tiempo y dinero al poder enfocarnos en procesos de limpieza de datos y entendimiento del problema y del negocio.
+* Nos faltó comunicación con el cliente (profesor) para resolver dudas y dejar de suponer cosas. Tambien faltó hacer más preguntas.
+* Los resultados del modelo parece ser bastante buenos. Creemos que se puede usar en un contexto serio para ponerlo a prueba.
+* El modelo terminó usando solo 3 de las 29 variables. Lo que nos hace suponer que si creamos un modelo manualmente entonces, seria mas complejo (mas variables).
+* Las personas que se retiran más son las peronas que por lo general gana menos en la compañia. La mayoria de personas que tenian salarios buenos, se encuentra en el el GRUPO de ACTIVO.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
